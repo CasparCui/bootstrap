@@ -5,16 +5,15 @@ language: node_js
 git:
   depth: 3
 node_js:
-  - "6"
-  - "8"
+  - "10"
 install:
-  - bundle install --deployment --jobs=3 --retry=3
-  - npm install
+  - bundle install --deployment --jobs=3 --retry=3 --clean --path vendor/bundle
+  - npm ci
 script:
   - npm test
-  - if [ "$TRAVIS_NODE_VERSION" = "8" ]; then npm run check-broken-links; fi
+  - npm run check-broken-links
 after_success:
-  - if [ "$TRAVIS_NODE_VERSION" = "8" ]; then npm run coveralls; fi
+  - then npm run coveralls
 stages:
   - test
   - name: browser
@@ -22,11 +21,11 @@ stages:
 jobs:
   include:
     - stage: browser
-      node_js: 8
+      node_js: 10
       script: if ! git log --format=%B --no-merges -n 1 | grep '\[skip browser\]'; then npm run js-test-cloud; fi
 cache:
   directories:
-    - node_modules
+    - "$HOME/.npm"
     - vendor/bundle
 notifications:
   email: false
